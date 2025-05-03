@@ -7,7 +7,9 @@ module.exports.list = async (req, res) => {
 
 module.exports.create = async (req, res) => {
 	const { title, description } = req.body;
-	const [task] = await pool.query('INSERT INTO tasks (title, description) VALUES (?, ?)', [title, description]);
+	const now = new Date();
+  const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+	const [task] = await pool.query('INSERT INTO tasks (title, description, created_at) VALUES (?, ?, ?)', [title, description, mysqlDatetime]);
 	res.json({ id: task.insertId, message: 'Task criada com sucesso.' });
 }
 
@@ -27,7 +29,10 @@ module.exports.edit = async (req, res) => {
 		return res.json({ message: "Recurso não encontrado."});
 	}
 
-	await pool.query('UPDATE tasks SET title = ?, description = ?, status = ? WHERE id = ?', [body.title || tasks[0].title, body.description || tasks[0].description, body.status || tasks[0].status, taskId]);
+	const now = new Date();
+  const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+
+	await pool.query('UPDATE tasks SET title = ?, description = ?, status = ?, updated_at = ? WHERE id = ?', [body.title || tasks[0].title, body.description || tasks[0].description, body.status || tasks[0].status, mysqlDatetime, taskId]);
 
 	res.json({ message: "Task atualizada com sucesso." });
 }
