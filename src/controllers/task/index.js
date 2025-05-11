@@ -1,7 +1,12 @@
 const pool = require('./../../utils/mysql');
+const Task = require('./../../models/task');
 
 module.exports.list = async (req, res) => {
-	const [tasks] = await pool.query('SELECT * FROM tasks WHERE deleted_at is NULL ORDER BY `order`');
+	const tasks = await Task.findAll({
+		order: [
+			['order', 'ASC']
+		]
+	});
 	res.json({ data: tasks });
 }
 
